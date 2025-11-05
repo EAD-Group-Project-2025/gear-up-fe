@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { UserRole } from "../../lib/types/Auth";
 import { authService, getUserFromToken } from "../../lib/services/authService";
+import { isDemoMode } from "../../lib/services/demoAuthService";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -51,7 +52,7 @@ export default function ProtectedRoute({
         // Check if user has required role
         if (user.role !== requiredRole) {
           console.warn(`⚠️ Insufficient permissions. Required: ${requiredRole}, Got: ${user.role}`);
-
+          
           // Redirect to appropriate dashboard based on user's actual role
           switch (user.role) {
             case UserRole.CUSTOMER:
@@ -69,7 +70,14 @@ export default function ProtectedRoute({
           return;
         }
 
-        console.log("✅ Authenticated as:", user.role);
+        // Check if in demo mode
+        const inDemoMode = isDemoMode();
+        if (inDemoMode) {
+          console.log("🎭 Demo mode active for role:", user.role);
+        } else {
+          console.log("✅ Authenticated as:", user.role);
+        }
+
         setIsAuthorized(true);
       } catch (error) {
         console.error("❌ Auth check error:", error);

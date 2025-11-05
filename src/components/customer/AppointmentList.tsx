@@ -47,33 +47,33 @@ interface AppointmentListProps {
 }
 
 const statusColors: Record<AppointmentStatus, string> = {
-  PENDING:
+  pending:
     "bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-800 border-yellow-300 shadow-sm",
-  CONFIRMED:
+  confirmed:
     "bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 border-blue-300 shadow-sm",
-  IN_PROGRESS:
+  "in-progress":
     "bg-gradient-to-r from-orange-100 to-red-100 text-orange-800 border-orange-300 shadow-sm",
-  COMPLETED:
+  completed:
     "bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-green-300 shadow-sm",
-  CANCELLED:
+  cancelled:
     "bg-gradient-to-r from-red-100 to-pink-100 text-red-800 border-red-300 shadow-sm",
 };
 
 const statusLabels: Record<AppointmentStatus, string> = {
-  PENDING: "Pending",
-  CONFIRMED: "Confirmed",
-  IN_PROGRESS: "In Progress",
-  COMPLETED: "Completed",
-  CANCELLED: "Cancelled",
+  pending: "Pending",
+  confirmed: "Confirmed",
+  "in-progress": "In Progress",
+  completed: "Completed",
+  cancelled: "Cancelled",
 };
 
 const consultationTypeLabels: Record<ConsultationType, string> = {
-  "GENERAL_CHECKUP": "General Checkup",
-  "SPECIFIC_ISSUE": "Specific Issue",
-  "MAINTENANCE_ADVICE": "Maintenance Advice",
-  "PERFORMANCE_ISSUE": "Performance Issue",
-  "SAFETY_CONCERN": "Safety Concern",
-  "OTHER": "Other",
+  "general-checkup": "General Checkup",
+  "specific-issue": "Specific Issue",
+  "maintenance-advice": "Maintenance Advice",
+  "performance-issue": "Performance Issue",
+  "safety-concern": "Safety Concern",
+  other: "Other",
 };
 
 export default function AppointmentList({
@@ -114,7 +114,7 @@ export default function AppointmentList({
   };
 
   const canEditOrDelete = (status: AppointmentStatus) => {
-    return status === "PENDING" || status === "CONFIRMED";
+    return status === "pending" || status === "confirmed";
   };
 
   if (appointments.length === 0) {
@@ -149,18 +149,18 @@ export default function AppointmentList({
               {
                 appointments.filter(
                   (apt) =>
-                    apt.status === "PENDING" || apt.status === "CONFIRMED"
+                    apt.status === "pending" || apt.status === "confirmed"
                 ).length
               }
             </div>
-            <div className="text-sm text-gray-600">Pending</div>
+            <div className="text-sm text-gray-600">Upcoming</div>
           </CardContent>
         </Card>
 
         <Card>
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-green-600">
-              {appointments.filter((apt) => apt.status === "COMPLETED").length}
+              {appointments.filter((apt) => apt.status === "completed").length}
             </div>
             <div className="text-sm text-gray-600">Completed</div>
           </CardContent>
@@ -170,7 +170,7 @@ export default function AppointmentList({
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-orange-600">
               {
-                appointments.filter((apt) => apt.status === "IN_PROGRESS")
+                appointments.filter((apt) => apt.status === "in-progress")
                   .length
               }
             </div>
@@ -356,13 +356,13 @@ export default function AppointmentList({
                 className="border-l-4 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-r from-white to-gray-50 overflow-hidden"
                 style={{
                   borderLeftColor:
-                    appointment.status === "PENDING"
+                    appointment.status === "pending"
                       ? "#f59e0b"
-                      : appointment.status === "CONFIRMED"
+                      : appointment.status === "confirmed"
                       ? "#3b82f6"
-                      : appointment.status === "COMPLETED"
+                      : appointment.status === "completed"
                       ? "#10b981"
-                      : appointment.status === "CANCELLED"
+                      : appointment.status === "cancelled"
                       ? "#ef4444"
                       : "#f97316",
                 }}
@@ -466,7 +466,7 @@ export default function AppointmentList({
                             {appointment.employeeName}
                           </p>
                         )}
-                        {appointment.status === "COMPLETED" &&
+                        {appointment.status === "completed" &&
                           appointment.recommendedServices &&
                           appointment.recommendedServices.length > 0 && (
                             <p className="text-sm text-green-600 mt-1">

@@ -9,20 +9,20 @@ export interface ApiResponse<T> {
 
 // Frontend types for appointment system
 export type AppointmentStatus =
-  | "PENDING"
-  | "CONFIRMED"
-  | "IN_PROGRESS"
-  | "COMPLETED"
-  | "CANCELLED";
+  | "pending"
+  | "confirmed"
+  | "in-progress"
+  | "completed"
+  | "cancelled";
 
 // Consultation types - what customer is seeking help for
 export type ConsultationType =
-  | "GENERAL_CHECKUP"
-  | "SPECIFIC_ISSUE"
-  | "MAINTENANCE_ADVICE"
-  | "PERFORMANCE_ISSUE"
-  | "SAFETY_CONCERN"
-  | "OTHER";
+  | "general-checkup"
+  | "specific-issue"
+  | "maintenance-advice"
+  | "performance-issue"
+  | "safety-concern"
+  | "other";
 
 // Vehicle interface for frontend
 export interface Vehicle {
@@ -108,9 +108,7 @@ export interface AppointmentCreateRequest {
   appointmentDate: string; // YYYY-MM-DD format (matches backend DTO)
   notes?: string;
   vehicleId: number;
-  startTime: string; // HH:MM:SS format
-  endTime: string; // HH:MM:SS format
-  consultationType: string;
+  startTime?: string; // HH:MM:SS format
 }
 
 export interface AppointmentUpdateRequest {
@@ -119,5 +117,4 @@ export interface AppointmentUpdateRequest {
   notes?: string;
   startTime?: string; // HH:MM:SS format
   endTime?: string; // HH:MM:SS format
-  taskIds?: number[]; // Task IDs to link to this appointment
 }

@@ -13,15 +13,24 @@ export default function CustomerLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-
+  // Handle both /customer/login and /customer/login/ (with trailing slash)
+  const isLoginPage =
+    pathname === "/customer/login" || pathname === "/customer/login/";
+  
   // Handle chatbot page - full screen without header/sidebar
-  const isChatbotPage =
+  const isChatbotPage = 
     pathname === "/customer/chatbot" || pathname === "/customer/chatbot/";
+
+  if (isLoginPage) {
+    return <>{children}</>;
+  }
 
   if (isChatbotPage) {
     return (
       <ProtectedRoute requiredRole={UserRole.CUSTOMER} redirectTo="/login">
-        <div className="min-h-screen bg-gray-50">{children}</div>
+        <div className="min-h-screen bg-gray-50">
+          {children}
+        </div>
       </ProtectedRoute>
     );
   }

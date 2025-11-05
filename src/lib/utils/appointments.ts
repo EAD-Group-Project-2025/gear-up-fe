@@ -8,24 +8,24 @@ import { toMinutes } from "./datetime";
  */
 
 export type ConsultationType =
-  | "GENERAL_CHECKUP"
-  | "SPECIFIC_ISSUE"
-  | "MAINTENANCE_ADVICE"
-  | "PERFORMANCE_ISSUE"
-  | "SAFETY_CONCERN"
-  | "OTHER";
+  | "general-checkup"
+  | "specific-issue"
+  | "maintenance-advice"
+  | "performance-issue"
+  | "safety-concern"
+  | "other";
 
 /**
  * Map of consultation types to their display labels.
  * Using a const object instead of switch statement for better maintainability.
  */
 const CONSULTATION_TYPE_LABELS: Record<ConsultationType, string> = {
-  "GENERAL_CHECKUP": "General Vehicle Checkup",
-  "SPECIFIC_ISSUE": "Specific Issue Consultation",
-  "MAINTENANCE_ADVICE": "Maintenance Advice",
-  "PERFORMANCE_ISSUE": "Performance Issue",
-  "SAFETY_CONCERN": "Safety Concern",
-  "OTHER": "Other Consultation",
+  "general-checkup": "General Vehicle Checkup",
+  "specific-issue": "Specific Issue Consultation",
+  "maintenance-advice": "Maintenance Advice",
+  "performance-issue": "Performance Issue",
+  "safety-concern": "Safety Concern",
+  other: "Other Consultation",
 };
 
 /**
