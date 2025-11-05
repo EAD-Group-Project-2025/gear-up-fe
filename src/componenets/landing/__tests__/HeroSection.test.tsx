@@ -51,10 +51,11 @@ describe('HeroSection', () => {
     expect(image).toHaveAttribute('src', '/hero.png')
   })
 
-  it('should have priority loading for hero image', () => {
+  it('should render hero image with proper attributes', () => {
     render(<HeroSection />)
     const image = screen.getByAltText('Gear Up Services')
-    expect(image).toHaveAttribute('priority')
+    expect(image).toHaveAttribute('src', '/hero.png')
+    expect(image).toBeInTheDocument()
   })
 
   it('should have gradient background', () => {

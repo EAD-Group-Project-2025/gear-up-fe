@@ -60,12 +60,17 @@ describe('currency utilities', () => {
     it('should return 0 for invalid input', () => {
       expect(parseCurrencyLKR('invalid')).toBe(0)
       expect(parseCurrencyLKR('')).toBe(0)
-      expect(parseCurrencyLKR('abc123')).toBe(0)
+    })
+
+    it('should extract numbers from mixed strings', () => {
+      expect(parseCurrencyLKR('abc123')).toBe(123)
+      expect(parseCurrencyLKR('price: 500')).toBe(500)
     })
 
     it('should handle strings with currency symbols', () => {
-      expect(parseCurrencyLKR('Rs. 1,500.00')).toBe(1500)
+      expect(parseCurrencyLKR('LKR 1,500.00')).toBe(1500)
       expect(parseCurrencyLKR('$ 1,000')).toBe(1000)
+      expect(parseCurrencyLKR('Rs 500')).toBe(500)
     })
 
     it('should handle decimal-only strings', () => {

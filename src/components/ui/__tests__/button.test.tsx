@@ -49,13 +49,14 @@ describe('Button', () => {
   it('should render with outline variant', () => {
     render(<Button variant="outline">Outline</Button>)
     const button = screen.getByRole('button')
-    expect(button).toHaveClass('outline')
+    expect(button).toHaveClass('border')
+    expect(button).toHaveClass('bg-background')
   })
 
   it('should render with ghost variant', () => {
     render(<Button variant="ghost">Ghost</Button>)
     const button = screen.getByRole('button')
-    expect(button).toHaveClass('ghost')
+    expect(button).toHaveClass('hover:bg-accent')
   })
 
   it('should render with secondary variant', () => {

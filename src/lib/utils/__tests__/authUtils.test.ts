@@ -70,12 +70,14 @@ describe('authUtils', () => {
   describe('handleAuthError', () => {
     it('should clear localStorage and return session expired error for 401', () => {
       localStorage.setItem('accessToken', 'test-token')
+      localStorage.setItem('otherKey', 'otherValue')
       const response = { status: 401 } as Response
       
       const error = handleAuthError(response)
       
       expect(error.message).toBe('Session expired. Please login again.')
       expect(localStorage.getItem('accessToken')).toBeNull()
+      expect(localStorage.getItem('otherKey')).toBeNull()
     })
 
     it('should return generic error for non-401 status', () => {
