@@ -86,18 +86,39 @@ export default function EmployeeDashboard() {
 				projectService.getEmployeeProjects().catch(() => [] as Project[]), // Return empty array on error
 			]);
 
-			// Process task summary
+			console.log('Task Summary:', taskSummary);
+			console.log('Appointments:', appointments);
+			console.log('Projects:', projects);
+
+			// Process task summary - check all possible key variations
+			const assigned = taskSummary.assigned || taskSummary.Assigned || 0;
+			const inProg = taskSummary.inProgress || taskSummary.in_progress || taskSummary.InProgress || 
+						   taskSummary.inprogress || taskSummary.pending || taskSummary.Pending || 0;
+			const completedToday = taskSummary.completedToday || taskSummary.completed_today || 
+								  taskSummary.CompletedToday || taskSummary.completed || 0;
+			const reportedTotal = taskSummary.total || taskSummary.Total || 0;
+
+			// Calculate from appointments if task summary is empty
+			const confirmedCount = appointments.filter(a => a.status.toUpperCase() === 'CONFIRMED').length;
+			const inProgressCount = appointments.filter(a => a.status.toUpperCase() === 'IN_PROGRESS').length;
+			const completedCount = appointments.filter(a => a.status.toUpperCase() === 'COMPLETED').length;
+
+			const derivedTotal = Math.max(reportedTotal, assigned + inProg + completedToday, appointments.length);
+
 			const stats: DashboardStats = {
-				assignedServices: taskSummary.assigned || taskSummary.total || 0,
-				inProgress: taskSummary.inProgress || taskSummary.pending || 0,
-				completedToday: taskSummary.completedToday || 0,
-				total: taskSummary.total || 0,
+				assignedServices: assigned || confirmedCount || appointments.length,
+				inProgress: inProg || inProgressCount,
+				completedToday: completedToday || completedCount,
+				total: derivedTotal,
 			};
 
-			// Calculate daily progress
+			console.log('Calculated Stats:', stats);
+
+			// Calculate daily progress (guard against division by zero)
+			const totalForProgress = derivedTotal > 0 ? derivedTotal : (assigned + inProg) || appointments.length || 1;
 			const dailyProgress = {
-				completed: stats.completedToday,
-				total: stats.total || stats.assignedServices,
+				completed: completedToday || completedCount,
+				total: totalForProgress,
 			};
 
 			// Calculate projects by status
@@ -252,9 +273,14 @@ export default function EmployeeDashboard() {
 								<p className="text-gray-700 text-base font-semibold mb-1">
 									Daily Progress
 								</p>
-								<div className="text-4xl font-extrabold text-primary">
-									{Math.round((dailyProgress.completed / dailyProgress.total) * 100)}%
-								</div>
+                                <div className="text-4xl font-extrabold text-primary">
+                                    {(() => {
+                                        const t = dailyProgress.total || 0;
+                                        const c = dailyProgress.completed || 0;
+                                        const pct = t > 0 ? Math.min(100, Math.max(0, Math.round((c / t) * 100))) : 0;
+                                        return `${pct}%`;
+                                    })()}
+                                </div>
 							</div>
 							<div className="p-3 bg-primary rounded-lg shadow-sm">
 								<Clock className="h-8 w-8 text-white" />

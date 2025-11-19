@@ -76,7 +76,15 @@ export default function AppointmentsPage() {
         employeeService.getAllEmployees(),
         customerService.getAllCustomers(),
       ]);
-      setAppointments(appointmentsData);
+      
+      // Sort appointments by date and time (latest first)
+      const sortedAppointments = appointmentsData.sort((a, b) => {
+        const dateA = new Date(`${a.appointmentDate}T${a.startTime || '00:00:00'}`);
+        const dateB = new Date(`${b.appointmentDate}T${b.startTime || '00:00:00'}`);
+        return dateB.getTime() - dateA.getTime(); // Newest first
+      });
+      
+      setAppointments(sortedAppointments);
       setEmployees(employeesData);
       setCustomers(customersData);
     } catch (error: any) {
@@ -110,11 +118,15 @@ export default function AppointmentsPage() {
     }
 
     try {
-      await appointmentService.assignEmployee(
+      // Assign employee and auto-approve
+      await appointmentService.updateAppointment(
         selectedAppointment.id,
-        parseInt(selectedEmployeeId)
+        { 
+          employeeId: parseInt(selectedEmployeeId),
+          status: 'CONFIRMED'
+        }
       );
-      showToast('Employee assigned successfully', 'success');
+      showToast('Employee assigned and appointment approved successfully', 'success');
       setAssignDialogOpen(false);
       setSelectedAppointment(null);
       setSelectedEmployeeId('');
@@ -487,8 +499,8 @@ export default function AppointmentsPage() {
           <DialogHeader>
             <DialogTitle>Assign Employee to Appointment</DialogTitle>
             <DialogDescription>
-              Select an employee to assign to this appointment. This will change
-              the appointment status to CONFIRMED.
+              Select an employee to assign to this appointment. This will automatically
+              approve the appointment and change its status to CONFIRMED.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
@@ -668,25 +680,10 @@ function PendingApprovalTable({
   return (
     <Card className="bg-white shadow-lg border-0">
       <CardHeader className="pb-4">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-xl font-bold text-orange-600 flex items-center gap-2">
-            <Clock className="h-5 w-5" />
-            Appointments Pending Approval
-          </CardTitle>
-          <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-gray-500" />
-            <Select>
-              <SelectTrigger className="w-80">
-                <SelectValue placeholder="Filter by Customer/Employee/Date" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="customer">Customer</SelectItem>
-                <SelectItem value="employee">Employee</SelectItem>
-                <SelectItem value="date">Date</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+        <CardTitle className="text-xl font-bold text-orange-600 flex items-center gap-2">
+          <Clock className="h-5 w-5" />
+          Appointments Pending Approval
+        </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
         <Table>
@@ -700,7 +697,7 @@ function PendingApprovalTable({
                 Date & Time
               </TableHead>
               <TableHead className="font-semibold text-gray-700">
-                Type
+                Type & Employee
               </TableHead>
               <TableHead className="text-center font-semibold text-gray-700 w-[200px]">
                 Actions
@@ -742,7 +739,19 @@ function PendingApprovalTable({
                     </div>
                   </TableCell>
                   <TableCell className="py-4">
-                    <p className="text-sm text-gray-700">{appointment.consultationTypeLabel}</p>
+                    <div className="space-y-1">
+                      <p className="text-sm text-gray-700">{appointment.consultationTypeLabel}</p>
+                      <p className="text-xs text-gray-500">
+                        {appointment.employeeId ? (
+                          <span className="flex items-center gap-1">
+                            <UserPlus className="h-3 w-3" />
+                            {getEmployeeName(appointment.employeeId)}
+                          </span>
+                        ) : (
+                          <span className="text-orange-600">No employee assigned</span>
+                        )}
+                      </p>
+                    </div>
                   </TableCell>
                   <TableCell className="py-4">
                     <div className="flex flex-col gap-2">
@@ -779,7 +788,7 @@ function PendingApprovalTable({
                         className="h-8 px-2 bg-blue-100 text-blue-700 hover:bg-blue-200 text-xs"
                       >
                         <UserPlus className="h-3 w-3 mr-1" />
-                        Assign
+                        {appointment.employeeId ? 'Reassign' : 'Assign'}
                       </Button>
                     </div>
                   </TableCell>
@@ -872,29 +881,14 @@ function TableWrapper({
   return (
     <Card className="bg-white shadow-lg border-0">
       <CardHeader className="pb-4">
-        <div className="flex items-center justify-between">
-          <CardTitle
-            className={`text-xl font-bold flex items-center gap-2 ${getStatusColor(
-              status
-            )}`}
-          >
-            {getStatusIcon(status)}
-            {status} Appointments
-          </CardTitle>
-          <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-gray-500" />
-            <Select>
-              <SelectTrigger className="w-80">
-                <SelectValue placeholder="Filter by Customer/Employee/Date" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="customer">Customer</SelectItem>
-                <SelectItem value="employee">Employee</SelectItem>
-                <SelectItem value="date">Date</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+        <CardTitle
+          className={`text-xl font-bold flex items-center gap-2 ${getStatusColor(
+            status
+          )}`}
+        >
+          {getStatusIcon(status)}
+          {status} Appointments
+        </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
         <Table>
@@ -908,7 +902,7 @@ function TableWrapper({
                 Date & Time
               </TableHead>
               <TableHead className="font-semibold text-gray-700">
-                Type
+                Type & Employee
               </TableHead>
               <TableHead className="text-center font-semibold text-gray-700 w-[150px]">
                 Actions
@@ -950,7 +944,19 @@ function TableWrapper({
                     </div>
                   </TableCell>
                   <TableCell className="py-4">
-                    <p className="text-sm text-gray-700">{appointment.consultationTypeLabel}</p>
+                    <div className="space-y-1">
+                      <p className="text-sm text-gray-700">{appointment.consultationTypeLabel}</p>
+                      <p className="text-xs text-gray-500">
+                        {appointment.employeeId ? (
+                          <span className="flex items-center gap-1">
+                            <UserPlus className="h-3 w-3" />
+                            {getEmployeeName(appointment.employeeId)}
+                          </span>
+                        ) : (
+                          <span className="text-orange-600">No employee assigned</span>
+                        )}
+                      </p>
+                    </div>
                   </TableCell>
                   <TableCell className="py-4">
                     <div className="flex gap-2 justify-center">
@@ -967,6 +973,7 @@ function TableWrapper({
                         size="sm"
                         onClick={() => onAssignEmployee(appointment)}
                         className="h-8 px-2 bg-blue-100 text-blue-700 hover:bg-blue-200 text-xs"
+                        title={appointment.employeeId ? 'Reassign Employee' : 'Assign Employee'}
                       >
                         <UserPlus className="h-3 w-3" />
                       </Button>
